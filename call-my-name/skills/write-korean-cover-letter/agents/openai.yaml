@@ -1,0 +1,4 @@
+interface:
+  display_name: "맞춤 자기소개서"
+  short_description: "경력 분석부터 채용공고 탐색과 맞춤 자소서 작성까지"
+  default_prompt: "Use $write-korean-cover-letter to analyze my background, find suitable openings, and draft a tailored Korean cover letter."

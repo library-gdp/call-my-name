@@ -1,0 +1,22 @@
+{
+  "name": "call-my-name",
+  "version": "0.1.0",
+  "description": "Analyze candidate profiles, discover matching Korean jobs, and draft tailored cover letters.",
+  "author": {
+    "name": "Personal"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "맞춤 자기소개서",
+    "shortDescription": "내 경력과 채용공고를 연결해 맞춤 자기소개서를 작성합니다.",
+    "longDescription": "경력·교육·역량을 구조화하고, 공개된 국내 채용공고를 탐색해 적합도를 비교한 뒤 기업과 직무에 맞는 근거 기반 자기소개서를 작성합니다.",
+    "developerName": "Personal",
+    "category": "Productivity",
+    "capabilities": ["Research", "Analysis", "Write"],
+    "defaultPrompt": [
+      "내 이력 자료를 분석해 지원자 프로필을 만들어 줘.",
+      "내 프로필에 맞는 현재 채용공고를 찾아 비교해 줘.",
+      "이 채용공고에 맞춘 자기소개서 초안을 작성해 줘."
+    ]
+  }
+}
