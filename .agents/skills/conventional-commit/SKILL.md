@@ -1,6 +1,6 @@
 ---
-name: commit-changes
-description: Git 변경 사항을 현재 세션의 작업 범위에 맞게 선별하고 Conventional Commits 1.0.0 형식의 메시지로 안전하게 커밋한다. 사용자가 커밋, 변경 사항 저장, 커밋 메시지 작성, Conventional Commits 적용을 요청할 때 사용한다.
+name: conventional-commit
+description: 사용자가 커밋, Commit, 변경 사항 저장, 커밋 메시지 작성, Conventional Commits 적용을 요청할 때 사용한다.
 ---
 
 # 변경 사항 커밋
