@@ -1,17 +1,21 @@
-# Repository Guidelines
+# 저장소 지침
 
-## Project Structure & Module Organization
+## 공용 언어
 
-This repository contains a Codex skill rather than a deployable application. The skill lives under `call-my-name/skills/write-korean-cover-letter/`:
+이 프로젝트의 공용 언어는 한국어입니다. 문서, 이슈, 커밋 메시지, 코드 리뷰, 에이전트의 설명과 결과물은 원칙적으로 한국어로 작성합니다. 단, 코드 식별자, 파일명, 경로, 명령어, API 이름처럼 정확한 기술 표기가 필요한 항목은 원문을 유지합니다.
 
-- `SKILL.md` defines the skill metadata, operating rules, workflow, and output checks.
-- `agents/openai.yaml` provides the user-facing display name, description, and default prompt.
-- `references/writing-guide.md` contains detailed writing criteria loaded when needed.
+## 프로젝트 구조 및 모듈 구성
 
-Keep core instructions concise in `SKILL.md`; place supporting detail in `references/` and link to it with a relative path. Add new skills as sibling directories under `call-my-name/skills/`, using lowercase kebab-case names.
+이 저장소에는 배포 가능한 애플리케이션이 아니라 Codex 스킬이 포함되어 있습니다. 스킬은 `call-my-name/skills/write-korean-cover-letter/` 아래에 있습니다.
 
-These commands inventory skill files, review heading structure, confirm YAML text renders as UTF-8, and detect whitespace errors. Before submitting, invoke the skill in Codex with a representative Korean cover-letter request and verify that referenced files load correctly.
+- `SKILL.md`는 스킬 메타데이터, 운영 규칙, 작업 흐름 및 출력 점검 기준을 정의합니다.
+- `agents/openai.yaml`은 사용자에게 표시되는 이름, 설명 및 기본 프롬프트를 제공합니다.
+- `references/writing-guide.md`는 필요할 때 불러오는 상세 작성 기준을 포함합니다.
 
-## Security & Source Integrity
+핵심 지침은 `SKILL.md`에 간결하게 유지하고, 보충 설명은 `references/`에 배치한 뒤 상대 경로로 연결합니다. 새 스킬은 `call-my-name/skills/` 아래에 형제 디렉터리로 추가하며, 디렉터리 이름은 소문자 케밥 표기법을 사용합니다.
 
-Never commit resumes, credentials, detailed addresses, resident registration numbers, or other applicant data. Preserve the skill's requirements to use public sources, respect access restrictions, verify posting status and deadlines, and distinguish sourced facts from interpretation.
+관련 명령어로 스킬 파일 목록을 확인하고, 제목 구조를 검토하며, YAML 텍스트가 UTF-8로 올바르게 표시되는지 확인하고, 공백 오류를 탐지합니다. 제출하기 전에 Codex에서 대표적인 한국어 자기소개서 요청으로 스킬을 실행하고 참조 파일이 올바르게 로드되는지 확인합니다.
+
+## 보안 및 출처 무결성
+
+이력서, 자격 증명, 상세 주소, 주민등록번호 또는 그 밖의 지원자 개인정보를 절대 커밋하지 않습니다. 공개 출처를 사용하고, 접근 제한을 준수하며, 채용 공고 상태와 마감일을 확인하고, 출처로 확인된 사실과 해석을 구분해야 한다는 스킬의 요구 사항을 유지합니다.
