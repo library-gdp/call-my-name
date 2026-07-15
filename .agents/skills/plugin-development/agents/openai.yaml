@@ -1,0 +1,4 @@
+interface:
+  display_name: "call-my-name 플러그인 개발"
+  short_description: "call-my-name 플러그인 하네스 구성요소 개발"
+  default_prompt: "$plugin-development를 사용해 call-my-name 플러그인에 요청한 구성요소를 추가해 주세요."
