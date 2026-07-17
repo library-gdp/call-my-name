@@ -1,0 +1,4 @@
+interface:
+  display_name: "사용자 컨텍스트 수집"
+  short_description: "업로드한 이력 자료를 읽고 중복 없이 사용자 정보를 정리합니다"
+  default_prompt: "$user-inspection을 사용해 src의 파일을 읽고 중복을 제거한 사용자 컨텍스트 Markdown을 생성해 줘."
