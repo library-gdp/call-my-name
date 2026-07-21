@@ -1,0 +1,4 @@
+interface:
+  display_name: "사용자 컨텍스트 수집"
+  short_description: "자료에서 지원자의 사실·경험·역량을 구조화합니다"
+  default_prompt: "Use $collect-user-context to read the files in workspace-root src/ and build USER_INSPECTION.md from my verified facts, experiences, and capabilities."
