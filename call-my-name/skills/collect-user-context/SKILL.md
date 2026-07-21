@@ -19,7 +19,11 @@ description: Read, collect, inspect, parse, extract, inventory, organize, summar
 1. 읽을 수 있는 텍스트 파일은 원문 그대로 읽고 파일명과 줄 번호를 출처 위치로 기록하라.
 2. 바이너리 파일마다 `SKILL_DIR/scripts/parse_<format>.py` 형식의 전용 Python 파서가 있는지 확인하라. 하나의 파서는 하나의 파일 형식만 처리해야 한다.
 3. 파서가 없으면 해당 형식과 공개 명세에 맞는 파서를 먼저 작성하라. 초기 배포물에 파서나 패키지 목록이 있다고 가정하지 말고, 실제 입력 형식에 필요한 코드와 라이브러리만 선택하라.
-4. 파서를 만들거나 실행하기 전에 `python3 --version`과 `uv --version`을 각각 확인하라. 둘 중 하나라도 설치되어 있지 않거나 실행되지 않으면 설치를 대신 시도하지 마라. 누락된 프로그램을 사용자에게 설치해 달라고 요청하고 바이너리 문서 처리를 중단하라.
+4. 파서를 만들거나 실행하기 전에 `python3 --version`과 `uv --version`을 각각 확인하라. 둘 중 하나라도 설치되어 있지 않거나 실행되지 않으면 설치를 대신 시도하지 말고 바이너리 문서 처리를 중단하라.
+   - `설치되지 않음: python3`, `설치되지 않음: uv`처럼 누락되거나 실행할 수 없는 프로그램을 각각 명시하라.
+   - 현재 운영체제와 패키지 관리자를 확인할 수 있으면 프로그램별 실제 설치 명령, 명령 실행 뒤 필요한 셸 재시작이나 `PATH` 적용 방법, 설치 확인 명령을 순서대로 설명하라. 공식 설치 문서는 보조 링크로 함께 제공할 수 있지만 URL만 단독으로 제시하지 마라.
+   - 운영체제나 패키지 관리자를 확정할 수 없으면 임의의 설치 명령을 제시하지 말고 Python은 `https://www.python.org/downloads/`, uv는 `https://docs.astral.sh/uv/getting-started/installation/`을 안내하라.
+   - 설치 후 `python3 --version`과 `uv --version`을 모두 다시 실행해 달라고 요청하라.
 5. `<workspace>/__workspace__/agent/collect-user-context-venv/`를 `uv venv --python python3`로 생성하고 이후 실행에서 재사용하라. 파서에 필요한 패키지는 `uv pip install --python <venv-python> ...`으로 이 환경에만 설치하라. 전역 Python 환경을 변경하지 마라.
 6. 새 파서는 실제 입력을 처리하기 전에 최소 입력 또는 안전한 합성 파일로 실행 가능성을 검사하라. 파서의 stdout은 아래 JSON 계약을 따르고 진단은 stderr에 쓰며 실패 시 0이 아닌 종료 코드를 반환하게 하라.
 
