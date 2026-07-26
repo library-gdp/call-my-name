@@ -1,6 +1,6 @@
 ---
 name: collect-user-context
-description: Read, collect, inspect, parse, extract, inventory, organize, summarize, and structure a job seeker's personal facts, career history, education, research, certifications, links, resumes, portfolios, career descriptions, and prior cover letters from files placed in workspace-root src/. Infer evidence-backed capabilities and map them to deduplicated experiences, then write USER_INSPECTION.md for downstream job matching and application writing. Use aggressively when the user asks to 내 정보·이력·경력·학력·경험·역량을 수집, 불러오기, 읽기, 파싱, 분석, 추출, 정리, 구조화, 프로필화, 인벤토리화하거나 지원자 컨텍스트·후보자 프로필·이력 자료 분석을 요청할 때, and whenever files or public profile/blog/GitHub links should become reusable candidate context. Trigger for text, PDF, DOCX, PPTX, XLSX, resumes, CVs, transcripts, portfolios, career documents, and cover-letter archives. Do not use for job-posting discovery or application drafting unless collecting the user's source context is part of that request.
+description: Read, collect, inspect, parse, extract, inventory, organize, summarize, and structure a job seeker's personal facts, career history, education, research, certifications, links, resumes, portfolios, career descriptions, and prior cover letters from files placed in workspace-root src/user-info/. Infer evidence-backed capabilities and map them to deduplicated experiences, then write USER_INSPECTION.md for downstream job matching and application writing. Use aggressively when the user asks to 내 정보·이력·경력·학력·경험·역량을 수집, 불러오기, 읽기, 파싱, 분석, 추출, 정리, 구조화, 프로필화, 인벤토리화하거나 지원자 컨텍스트·후보자 프로필·이력 자료 분석을 요청할 때, and whenever files or public profile/blog/GitHub links should become reusable candidate context. Trigger for text, PDF, DOCX, PPTX, XLSX, resumes, CVs, transcripts, portfolios, career documents, and cover-letter archives. Do not use for job-posting discovery or application drafting unless collecting the user's source context is part of that request.
 ---
 
 # 사용자 컨텍스트 수집
@@ -9,10 +9,10 @@ description: Read, collect, inspect, parse, extract, inventory, organize, summar
 
 ## 경로 확정
 
-- 실행 작업공간의 루트를 기준으로 입력은 `src/`, 출력은 `__workspace__/agent/USER_INSPECTION.md`로 고정하라.
+- 실행 작업공간의 루트를 기준으로 입력은 `src/user-info/`, 출력은 `__workspace__/agent/USER_INSPECTION.md`로 고정하라.
 - 이 Skill이 설치된 디렉터리는 `SKILL_DIR`로 지칭하라. 동적으로 만든 파서는 `SKILL_DIR/scripts/` 아래에만 두라.
-- `src/` 아래의 일반 파일을 재귀적으로 조사하되 `src/` 밖을 가리키는 심볼릭 링크는 따라가지 마라.
-- `src/`가 없거나, 파일이 없거나, 모든 파일에서 사용자와 관련된 사실을 하나도 확인하지 못하면 출력 파일을 만들거나 바꾸지 마라. 작업을 즉시 끝내고 사용자에게 작업공간의 `src/`에 이력서, 경력기술서, 포트폴리오 등 적절한 자료를 넣어 달라고 요청하라.
+- `src/user-info/` 아래의 일반 파일을 재귀적으로 조사하되 `src/user-info/` 밖을 가리키는 심볼릭 링크는 따라가지 마라.
+- `src/user-info/`가 없거나, 파일이 없거나, 모든 파일에서 사용자와 관련된 사실을 하나도 확인하지 못하면 출력 파일을 만들거나 바꾸지 마라. 작업을 즉시 끝내고 사용자에게 작업공간의 `src/user-info/`에 이력서, 경력기술서, 포트폴리오 등 적절한 자료를 넣어 달라고 요청하라.
 
 ## 자료 읽기
 
@@ -38,7 +38,7 @@ description: Read, collect, inspect, parse, extract, inventory, organize, summar
 
 - 본문, 표 셀, 하이퍼링크 표시 문자열처럼 의미 있는 내용만 추출하라. 문서 작성자, 생성 프로그램, 생성·수정 시각 등 파일 메타데이터는 출력하지 마라.
 - 스캔 문서처럼 텍스트를 추출할 수 없거나, 패키지를 설치할 수 없거나, `SKILL_DIR/scripts/`에 쓸 수 없는 파일은 접근 불가로 기록하고 그 파일에서 정보를 추측하지 마라.
-- 접근 불가 자료는 무시하고 나머지 자료로 계속하라. 처리 가능한 관련 자료가 하나도 남지 않으면 `src/`에 읽을 수 있는 자료를 제공해 달라고 요청하고 종료하라.
+- 접근 불가 자료는 무시하고 나머지 자료로 계속하라. 처리 가능한 관련 자료가 하나도 남지 않으면 `src/user-info/`에 읽을 수 있는 자료를 제공해 달라고 요청하고 종료하라.
 
 ## 정보와 공개 링크 수집
 
@@ -65,5 +65,5 @@ description: Read, collect, inspect, parse, extract, inventory, organize, summar
 ## 결과 저장
 
 - 세 섹션을 모두 구성한 뒤에만 `__workspace__/agent/`를 생성하라.
-- 임시 파일에 완성본을 쓴 뒤 `USER_INSPECTION.md`로 원자적으로 교체하라. 기존 결과와 병합하지 말고 현재 `src/`와 현재 접근 가능한 공개 링크만으로 전체를 재생성하라.
+- 임시 파일에 완성본을 쓴 뒤 `USER_INSPECTION.md`로 원자적으로 교체하라. 기존 결과와 병합하지 말고 현재 `src/user-info/`와 현재 접근 가능한 공개 링크만으로 전체를 재생성하라.
 - 완료 전에 민감정보 제외, 중복 경험 통합, 출처 존재, `EXP-*` 참조 무결성, 미제공 내용의 비창작 여부를 검사하라.
