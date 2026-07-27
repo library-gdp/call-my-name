@@ -1,5 +1,5 @@
 ---
-name: plugin-development
+name: plugin-skill-dev-rule
 description: call-my-name 플러그인에 배포할 Skill, Agent, Hook, MCP 설정, AGENTS.md 및 연관 매니페스트를 사용자의 지시에 따라 생성·수정하고 검증한다. call-my-name/ 아래의 플러그인 하네스 구성요소를 추가하거나 갱신해 달라는 요청에 사용한다. 저장소 개발용 .agents 또는 .codex 하네스의 작성, 플러그인 기능 기획, 범용 플러그인 작성법 문서화에는 사용하지 않는다.
 ---
 
