@@ -1,0 +1,4 @@
+interface:
+  display_name: "문서 파일 파싱"
+  short_description: "PDF·Office 문서에서 출처 위치별 텍스트를 추출합니다"
+  default_prompt: "Use $parse-document-files to extract source-located text from the specified non-plain-text document files."

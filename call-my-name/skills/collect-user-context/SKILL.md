@@ -10,35 +10,16 @@ description: Read, collect, inspect, parse, extract, inventory, organize, summar
 ## 경로 확정
 
 - 실행 작업공간의 루트를 기준으로 입력은 `src/user-info/`, 출력은 `__workspace__/agent/USER_INSPECTION.md`로 고정하라.
-- 이 Skill이 설치된 디렉터리는 `SKILL_DIR`로 지칭하라. 동적으로 만든 파서는 `SKILL_DIR/scripts/` 아래에만 두라.
 - `src/user-info/` 아래의 일반 파일을 재귀적으로 조사하되 `src/user-info/` 밖을 가리키는 심볼릭 링크는 따라가지 마라.
 - `src/user-info/`가 없거나, 파일이 없거나, 모든 파일에서 사용자와 관련된 사실을 하나도 확인하지 못하면 출력 파일을 만들거나 바꾸지 마라. 작업을 즉시 끝내고 사용자에게 작업공간의 `src/user-info/`에 이력서, 경력기술서, 포트폴리오 등 적절한 자료를 넣어 달라고 요청하라.
 
 ## 자료 읽기
 
 1. 읽을 수 있는 텍스트 파일은 원문 그대로 읽고 파일명과 줄 번호를 출처 위치로 기록하라.
-2. 바이너리 파일마다 `SKILL_DIR/scripts/parse_<format>.py` 형식의 전용 Python 파서가 있는지 확인하라. 하나의 파서는 하나의 파일 형식만 처리해야 한다.
-3. 파서가 없으면 해당 형식과 공개 명세에 맞는 파서를 먼저 작성하라. 초기 배포물에 파서나 패키지 목록이 있다고 가정하지 말고, 실제 입력 형식에 필요한 코드와 라이브러리만 선택하라.
-4. 파서를 만들거나 실행하기 전에 `python3 --version`과 `uv --version`을 각각 확인하라. 둘 중 하나라도 설치되어 있지 않거나 실행되지 않으면 설치를 대신 시도하지 말고 바이너리 문서 처리를 중단하라.
-   - `설치되지 않음: python3`, `설치되지 않음: uv`처럼 누락되거나 실행할 수 없는 프로그램을 각각 명시하라.
-   - 현재 운영체제와 패키지 관리자를 확인할 수 있으면 프로그램별 실제 설치 명령, 명령 실행 뒤 필요한 셸 재시작이나 `PATH` 적용 방법, 설치 확인 명령을 순서대로 설명하라. 공식 설치 문서는 보조 링크로 함께 제공할 수 있지만 URL만 단독으로 제시하지 마라.
-   - 운영체제나 패키지 관리자를 확정할 수 없으면 임의의 설치 명령을 제시하지 말고 Python은 `https://www.python.org/downloads/`, uv는 `https://docs.astral.sh/uv/getting-started/installation/`을 안내하라.
-   - 설치 후 `python3 --version`과 `uv --version`을 모두 다시 실행해 달라고 요청하라.
-5. `<workspace>/__workspace__/agent/collect-user-context-venv/`를 `uv venv --python python3`로 생성하고 이후 실행에서 재사용하라. 파서에 필요한 패키지는 `uv pip install --python <venv-python> ...`으로 이 환경에만 설치하라. 전역 Python 환경을 변경하지 마라.
-6. 새 파서는 실제 입력을 처리하기 전에 최소 입력 또는 안전한 합성 파일로 실행 가능성을 검사하라. 파서의 stdout은 아래 JSON 계약을 따르고 진단은 stderr에 쓰며 실패 시 0이 아닌 종료 코드를 반환하게 하라.
-
-```json
-{
-  "source_file": "파일명",
-  "units": [
-    {"locator": "page 1 | paragraph 3 | slide 2 | sheet 성적 row 4", "text": "추출 본문"}
-  ]
-}
-```
-
-- 본문, 표 셀, 하이퍼링크 표시 문자열처럼 의미 있는 내용만 추출하라. 문서 작성자, 생성 프로그램, 생성·수정 시각 등 파일 메타데이터는 출력하지 마라.
-- 스캔 문서처럼 텍스트를 추출할 수 없거나, 패키지를 설치할 수 없거나, `SKILL_DIR/scripts/`에 쓸 수 없는 파일은 접근 불가로 기록하고 그 파일에서 정보를 추측하지 마라.
-- 접근 불가 자료는 무시하고 나머지 자료로 계속하라. 처리 가능한 관련 자료가 하나도 남지 않으면 `src/user-info/`에 읽을 수 있는 자료를 제공해 달라고 요청하고 종료하라.
+2. PDF, DOCX, XLSX, PPTX를 포함해 원문 그대로 읽을 수 없는 파일은 반드시 `$parse-document-files`를 사용해 파싱하라. 대상 파일의 정확한 경로를 전달하고 이 Skill에서 파서를 직접 만들거나 파싱 방법을 정하지 마라.
+3. `$parse-document-files`가 반환한 각 `unit`의 `locator`와 `text`를 읽고, 파일명과 locator를 해당 내용의 출처 위치로 보존하라.
+4. 파싱할 수 없는 파일은 접근 불가로 기록하고 그 파일에서 정보를 추측하지 마라. 접근 불가 자료는 제외하고 나머지 자료로 계속하라.
+5. 처리 가능한 관련 자료가 하나도 남지 않으면 `src/user-info/`에 읽을 수 있는 자료를 제공해 달라고 요청하고 종료하라.
 
 ## 정보와 공개 링크 수집
 
