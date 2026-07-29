@@ -1,11 +1,11 @@
 ---
 name: plugin-skill-development
-description: "__workspace__/user/order/plugin-skill/SKILL_DESC_TO_DEVELOP.md에 정의된 요구사항으로 call-my-name 플러그인 Skill을 개발하고, 전용 개발·테스트·평가 Agent를 순차 오케스트레이션하여 평가가 PASS가 될 때까지 개선한다. 사용자가 요청 파일 기반의 플러그인 Skill 개발, Agent 협업 개발, 반복 테스트·평가 또는 PASS 판정까지의 구현을 요청할 때 사용한다."
+description: "__workspace__/user/order/plugin-skill/SKILL_DESC_TO_DEVELOP.md에 정의된 요구사항으로 call-my-name 플러그인 Skill을 개발하고, 전용 개발·테스트·평가 Agent를 순차 오케스트레이션하여 최대 3회 안에 PASS가 되도록 개선한다. 3회째에도 FAIL이면 실패 지점을 사용자에게 확인받는다. 사용자가 요청 파일 기반의 플러그인 Skill 개발, Agent 협업 개발, 반복 테스트·평가 또는 PASS 판정까지의 구현을 요청할 때 사용한다."
 ---
 
 # 플러그인 Skill 개발 오케스트레이션
 
-저장소의 전용 Agent 세 개에 개발, 실제 수행 테스트, 평가를 차례로 위임하고 평가 결과가 `PASS`가 될 때까지 반복하라. 각 Agent의 책임을 대신 수행하지 마라.
+저장소의 전용 Agent 세 개에 개발, 실제 수행 테스트, 평가를 차례로 위임하라. 평가 결과가 `FAIL`이면 최대 3회까지 반복하고, 3회째에도 `FAIL`이면 실패 지점을 사용자에게 확인받아라. 각 Agent의 책임을 대신 수행하지 마라.
 
 ## 경로 계약
 
@@ -34,11 +34,13 @@ description: "__workspace__/user/order/plugin-skill/SKILL_DESC_TO_DEVELOP.md에 
 
 `iterations/` 아래 기존 숫자 디렉터리 다음 번호를 세 자리로 정해 이번 반복의 `ITERATION_DIR`을 만들라. 첫 반복은 `001`이다. 재실행과 FAIL 후 반복 모두 새 디렉터리를 사용하고 이전 기록을 덮어쓰지 마라.
 
+이번 Skill 실행에서 3단계에 진입한 횟수를 `ATTEMPT_COUNT`로 계산하라. 첫 진입은 1회이며 최대값은 3이다. 기존 `iterations/`의 디렉터리 수나 번호는 `ATTEMPT_COUNT`에 포함하지 마라.
+
 두 번째 반복부터는 직전 반복의 `evaluation.md`를 개발 Agent 입력에 반드시 포함하라.
 
 ## 3. 개발 위임
 
-`plugin-skill-developer` Agent를 한 개 시작하고 완료될 때까지 기다리라. 다음 내용을 명시해 위임하라.
+`ATTEMPT_COUNT`가 3 이하인지 확인한 뒤 `plugin-skill-developer` Agent를 한 개 시작하고 완료될 때까지 기다리라. 4번째 개발 위임은 시작하지 마라. 다음 내용을 명시해 위임하라.
 
 - 요구사항 파일 전체를 작업 명세와 완료 기준으로 적용할 것
 - 직전 `evaluation.md`가 있으면 모든 FAIL 근거와 필수 수정 사항을 반영할 것
@@ -76,10 +78,10 @@ description: "__workspace__/user/order/plugin-skill/SKILL_DESC_TO_DEVELOP.md에 
 ## 6. 판정과 반복
 
 1. `evaluation.md` 첫 줄이 `PASS`이면 반복을 종료하라.
-2. 첫 줄이 `FAIL`이면 새 `ITERATION_DIR`을 만들고 3단계로 돌아가라. 직전 평가 파일의 경로를 새 개발 Agent에 전달하라.
-3. 수정 가능한 FAIL에는 임의의 반복 횟수 제한을 두지 마라.
-4. 필요한 사용자 입력의 부재, 권한 제한, 접근 불가 서비스처럼 개발 Agent가 코드로 해소할 수 없는 같은 차단 사유가 반복되면 무의미한 재실행을 중단하고 사용자에게 필요한 조치를 요청하라.
+2. 첫 줄이 `FAIL`이고 `ATTEMPT_COUNT`가 3 미만이면 `ATTEMPT_COUNT`를 1 증가시키고 새 `ITERATION_DIR`을 만든 뒤 3단계로 돌아가라. 직전 평가 파일의 경로를 새 개발 Agent에 전달하라.
+3. 첫 줄이 `FAIL`이고 `ATTEMPT_COUNT`가 3이면 반복 한도에 도달한 것이다. 4번째 반복을 시작하지 말고 마지막 `evaluation.md`에서 FAIL이 발생한 항목, 각 항목의 근거, 기대 동작, 확인 방법과 필수 수정 사항을 빠짐없이 요약하여 사용자에게 제시하라. 해당 FAIL 지점과 다음 수정 방향을 사용자가 확인하도록 요청한 뒤 종료하라.
+4. 필요한 사용자 입력의 부재, 권한 제한, 접근 불가 서비스처럼 개발 Agent가 코드로 해소할 수 없는 차단 사유가 확인되면 3회에 도달하기 전이라도 무의미한 재실행을 중단하고 사용자에게 차단된 지점과 필요한 조치를 요청하라.
 
 ## 완료 보고
 
-`PASS`인 경우 최종 구현 파일, 마지막 테스트 요약, 평가 파일 경로와 반복 횟수를 한국어로 보고하라. 커밋을 만들지 않았음을 명시하라. `PASS`가 아닌 상태에서는 완료했다고 표현하지 말고 종료 사유와 다음 조치를 분명히 안내하라.
+`PASS`인 경우 최종 구현 파일, 마지막 테스트 요약, 평가 파일 경로와 `ATTEMPT_COUNT`를 한국어로 보고하라. 커밋을 만들지 않았음을 명시하라. `PASS`가 아닌 상태에서는 완료했다고 표현하지 말고 종료 사유, FAIL 지점과 다음 조치를 분명히 안내하라.
