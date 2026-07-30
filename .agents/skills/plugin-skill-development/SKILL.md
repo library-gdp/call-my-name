@@ -25,6 +25,7 @@ description: "__workspace__/user/order/plugin-skill/SKILL_DESC_TO_DEVELOP.md에 
 3. 파일이 있으면 처음부터 끝까지 읽어 다음 항목을 확인하라.
    - `# Skill Description`
    - `Skill명`과 `개요`
+   - `## 필요성`과 Skill을 개발해야 하는 이유 및 해결하려는 문제
    - 하나 이상의 `## 워크플로우` 단계
    - `## Rule`
 4. `{Skill의 이름}`처럼 중괄호 자리표시자가 남아 있거나 필수 항목이 비어 있으면 파일을 변경하지 말고, 보완할 항목을 사용자에게 요청한 뒤 종료하라.
@@ -43,6 +44,7 @@ description: "__workspace__/user/order/plugin-skill/SKILL_DESC_TO_DEVELOP.md에 
 `ATTEMPT_COUNT`가 3 이하인지 확인한 뒤 `plugin-skill-developer` Agent를 한 개 시작하고 완료될 때까지 기다리라. 4번째 개발 위임은 시작하지 마라. 다음 내용을 명시해 위임하라.
 
 - 요구사항 파일 전체를 작업 명세와 완료 기준으로 적용할 것
+- `필요성`에 기술된 개발 이유와 해결하려는 문제를 설계·구현의 판단 기준으로 사용할 것
 - 직전 `evaluation.md`가 있으면 모든 FAIL 근거와 필수 수정 사항을 반영할 것
 - 저장소 지침과 `plugin-skill-dev-rule`을 준수하여 `call-my-name/` 배포물만 구현·검증할 것
 - 기존 사용자 변경과 테스트 입력을 보존하고 커밋하지 않을 것
@@ -68,6 +70,7 @@ description: "__workspace__/user/order/plugin-skill/SKILL_DESC_TO_DEVELOP.md에 
 테스트가 완료된 뒤 `plugin-skill-evaluator` Agent를 한 개 시작하고 완료될 때까지 기다리라. 다음 내용을 명시해 위임하라.
 
 - 요구사항 파일, 구현된 플러그인 변경, `developer-report.md`, `test-result.md`, 테스트 산출물을 근거로 평가할 것
+- 구현된 Skill이 `필요성`에 기술된 개발 이유와 해결하려는 문제에 부합하는지 판단할 것
 - 요구사항 충족, 실제 실행 성공, 출력 정확성, 경로·참조 무결성, 회귀 위험과 검증 충분성을 확인할 것
 - `ITERATION_DIR/evaluation.md` 첫 줄을 정확히 `PASS` 또는 `FAIL`로 작성할 것
 - `FAIL`이면 각 결함의 근거, 기대 동작, 재현 또는 확인 방법, 개발 Agent가 수행할 필수 수정 사항을 구체적으로 작성할 것
