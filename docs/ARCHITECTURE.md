@@ -22,7 +22,8 @@
 
 | Module | Skill Name | Description (When to use) |
 | --- | --- | --- |
-| User Analysis | `collect-user-context` | 지원자 분석에 필요한 인적·경력·학력·자격 정보를 파일, MCP 데이터소스 및 사용자 응답으로 수집하고 구조화할 때 사용한다. 이력서, 자기소개서, 포트폴리오 등 PDF·DOCX·PPTX 형식의 문서에서는 경험, 성과, 기술과 출처 정보를 추출한다. 자료가 부족하면 추가 질문으로 보완하고, 추출이 불확실한 내용은 사용자 확인 대상으로 표시한다. |
+| User Analysis | `parse-document-files` | PDF·DOCX·XLSX·PPTX 등 원문 그대로 읽을 수 없는 문서에서 위치 정보가 있는 텍스트를 추출해 다른 Skill에 반환할 때 사용한다. 문서 내용의 의미 분석이나 사용자 프로필 작성은 수행하지 않는다. |
+| User Analysis | `collect-user-context` | 지원자 분석에 필요한 인적·경력·학력·자격 정보를 파일, MCP 데이터소스 및 사용자 응답으로 수집하고 구조화할 때 사용한다. 비텍스트 문서는 `parse-document-files`의 추출 결과를 사용하고, 경험·성과·기술과 출처 정보를 사용자 컨텍스트로 구성한다. |
 | User Analysis | `review-user-profile` | 구조화된 사용자 정보와 역량 분석 결과를 검토 가능한 프로필로 제시하고 사용자의 정정·승인을 반영할 때 사용한다. 승인된 프로필은 공고 추천과 지원서류 작성에 재사용한다. |
 
 ## MCP/App 목록
