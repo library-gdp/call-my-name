@@ -1,11 +1,11 @@
 ---
 name: plugin-skill-development
-description: "__workspace__/user/order/plugin-skill/SKILL_DESC_TO_DEVELOP.md에 정의된 요구사항으로 call-my-name 플러그인 Skill을 개발하고, 전용 개발·테스트·평가 Agent를 순차 오케스트레이션하여 최대 3회 안에 PASS가 되도록 개선한다. 3회째에도 FAIL이면 실패 지점을 사용자에게 확인받는다. 사용자가 요청 파일 기반의 플러그인 Skill 개발, Agent 협업 개발, 반복 테스트·평가 또는 PASS 판정까지의 구현을 요청할 때 사용한다."
+description: "__workspace__/user/order/plugin-skill/SKILL_DESC_TO_DEVELOP.md에 정의된 요구사항으로 call-my-name 플러그인 Skill을 개발하고, 전용 개발·테스트·평가 Agent를 순차 오케스트레이션하여 최대 3회 안에 PASS가 되도록 개선한다. 기성 Skill은 call-my-name에 존재하는지 확인한 뒤 첫 개발 단계만 생략하고 테스트·평가부터 시작한다. 3회째에도 FAIL이면 실패 지점을 사용자에게 확인받는다. 사용자가 요청 파일 기반의 플러그인 Skill 개발, 기존 플러그인 Skill 검증, Agent 협업 개발, 반복 테스트·평가 또는 PASS 판정까지의 구현을 요청할 때 사용한다."
 ---
 
 # 플러그인 Skill 개발 오케스트레이션
 
-저장소의 전용 Agent 세 개에 개발, 실제 수행 테스트, 평가를 차례로 위임하라. 평가 결과가 `FAIL`이면 최대 3회까지 반복하고, 3회째에도 `FAIL`이면 실패 지점을 사용자에게 확인받아라. 각 Agent의 책임을 대신 수행하지 마라.
+저장소의 전용 Agent 세 개에 개발, 실제 수행 테스트, 평가를 차례로 위임하라. 단, `기성 Skill 여부`가 `true`이면 첫 번째 사이클의 개발만 생략하고 실제 수행 테스트와 평가부터 진행하라. 첫 평가가 `FAIL`이면 두 번째 사이클부터 개발, 테스트, 평가를 모두 수행하라. 평가 결과가 `FAIL`이면 최대 3회까지 반복하고, 3회째에도 `FAIL`이면 실패 지점을 사용자에게 확인받아라. 각 Agent의 책임을 대신 수행하지 마라.
 
 ## 경로 계약
 
@@ -24,20 +24,24 @@ description: "__workspace__/user/order/plugin-skill/SKILL_DESC_TO_DEVELOP.md에 
 2. 파일을 생성한 실행에서는 Agent를 시작하지 말고 즉시 종료하라. 사용자에게 생성한 경로와 파일을 채운 뒤 이 Skill을 다시 실행하라고 요청하라.
 3. 파일이 있으면 처음부터 끝까지 읽어 다음 항목을 확인하라.
    - `# Skill Description`
-   - `Skill명`과 `개요`
+   - `Skill명`, `개요`, `기성 Skill 여부`
    - `## 필요성`과 Skill을 개발해야 하는 이유 및 해결하려는 문제
    - 하나 이상의 `## 워크플로우` 단계
    - `## Rule`
-4. `{Skill의 이름}`처럼 중괄호 자리표시자가 남아 있거나 필수 항목이 비어 있으면 파일을 변경하지 말고, 보완할 항목을 사용자에게 요청한 뒤 종료하라.
-5. `test-input/`의 파일 목록을 재귀적으로 기록하라. 디렉터리가 없거나 비어 있어도 개발은 시작할 수 있으나, 대상 Skill이 외부 입력 파일을 요구하면 테스트 불가 사유가 될 수 있음을 이후 평가에 전달하라.
+4. `기성 Skill 여부`가 없으면 `false`로 해석하라. 값이 있으면 소문자 불리언 `true` 또는 `false`인지 확인하고, 다른 값이면 파일을 변경하지 말고 사용자에게 수정을 요청한 뒤 종료하라.
+5. `{Skill의 이름}`처럼 중괄호 자리표시자가 남아 있거나 필수 항목이 비어 있으면 파일을 변경하지 말고, 보완할 항목을 사용자에게 요청한 뒤 종료하라.
+6. `기성 Skill 여부`가 `true`이면 `call-my-name/skills/*/SKILL.md`의 YAML frontmatter `name`이 요구사항의 `Skill명`과 정확히 일치하는 Skill을 찾아라. 일치하는 Skill이 없으면 반복 디렉터리를 만들거나 Agent를 시작하지 말고, 확인한 `Skill명`과 검색 경로를 사용자에게 보고한 뒤 작업을 중지하라.
+7. `test-input/`의 파일 목록을 재귀적으로 기록하라. 디렉터리가 없거나 비어 있어도 개발은 시작할 수 있으나, 대상 Skill이 외부 입력 파일을 요구하면 테스트 불가 사유가 될 수 있음을 이후 평가에 전달하라.
 
 ## 2. 반복 실행 준비
 
 `iterations/` 아래 기존 숫자 디렉터리 다음 번호를 세 자리로 정해 이번 반복의 `ITERATION_DIR`을 만들라. 첫 반복은 `001`이다. 재실행과 FAIL 후 반복 모두 새 디렉터리를 사용하고 이전 기록을 덮어쓰지 마라.
 
-이번 Skill 실행에서 3단계에 진입한 횟수를 `ATTEMPT_COUNT`로 계산하라. 첫 진입은 1회이며 최대값은 3이다. 기존 `iterations/`의 디렉터리 수나 번호는 `ATTEMPT_COUNT`에 포함하지 마라.
+이번 Skill 실행에서 평가 사이클에 진입한 횟수를 `ATTEMPT_COUNT`로 계산하라. 첫 사이클은 1회이며 최대값은 3이다. 기존 `iterations/`의 디렉터리 수나 번호는 `ATTEMPT_COUNT`에 포함하지 마라.
 
 두 번째 반복부터는 직전 반복의 `evaluation.md`를 개발 Agent 입력에 반드시 포함하라.
+
+`기성 Skill 여부`가 `true`이고 `ATTEMPT_COUNT`가 1이면 3단계를 생략하고 4단계로 진행하라. 그 외에는 3단계부터 진행하라.
 
 ## 3. 개발 위임
 
@@ -54,12 +58,12 @@ description: "__workspace__/user/order/plugin-skill/SKILL_DESC_TO_DEVELOP.md에 
 
 ## 4. 직접 수행 테스트 위임
 
-개발이 완료된 뒤 `plugin-skill-tester` Agent를 한 개 시작하고 완료될 때까지 기다리라. 개발 Agent와 동시에 실행하지 마라. 다음 내용을 명시해 위임하라.
+개발이 완료된 뒤 `plugin-skill-tester` Agent를 한 개 시작하고 완료될 때까지 기다리라. `기성 Skill 여부`가 `true`인 첫 사이클에는 개발 완료를 기다리지 않고 바로 시작하라. 개발 Agent와 동시에 실행하지 마라. 다음 내용을 명시해 위임하라.
 
-- 요구사항 파일, 실제로 구현된 Skill, `developer-report.md`를 읽을 것
+- 요구사항 파일과 실제로 구현된 Skill을 읽고, 이번 사이클에 개발을 수행했다면 `developer-report.md`도 읽을 것
 - `test-input/`의 모든 관련 파일을 사용하되 원본을 변경하지 않을 것
 - `ITERATION_DIR/test-workspace/`에 격리된 작업공간을 만들고 테스트 입력의 상대 구조를 보존해 복사할 것
-- 새 Skill을 단순 정적 검토하지 말고 대표 사용자 요청으로 직접 수행할 것
+- 대상 Skill을 단순 정적 검토하지 말고 대표 사용자 요청으로 직접 수행할 것
 - 성공·실패한 시나리오, 실행 명령·도구, 실제 산출물 경로, 기대 결과와 실제 결과를 `ITERATION_DIR/test-result.md`에 기록할 것
 - 플러그인 소스의 결함을 발견해도 직접 수정하지 말 것
 
@@ -69,7 +73,7 @@ description: "__workspace__/user/order/plugin-skill/SKILL_DESC_TO_DEVELOP.md에 
 
 테스트가 완료된 뒤 `plugin-skill-evaluator` Agent를 한 개 시작하고 완료될 때까지 기다리라. 다음 내용을 명시해 위임하라.
 
-- 요구사항 파일, 구현된 플러그인 변경, `developer-report.md`, `test-result.md`, 테스트 산출물을 근거로 평가할 것
+- 요구사항 파일, 대상 Skill과 플러그인 변경, `test-result.md`, 테스트 산출물을 근거로 평가하고, 이번 사이클에 개발을 수행했다면 `developer-report.md`도 근거에 포함할 것
 - 구현된 Skill이 `필요성`에 기술된 개발 이유와 해결하려는 문제에 부합하는지 판단할 것
 - 요구사항 충족, 실제 실행 성공, 출력 정확성, 경로·참조 무결성, 회귀 위험과 검증 충분성을 확인할 것
 - `ITERATION_DIR/evaluation.md` 첫 줄을 정확히 `PASS` 또는 `FAIL`로 작성할 것
@@ -81,7 +85,7 @@ description: "__workspace__/user/order/plugin-skill/SKILL_DESC_TO_DEVELOP.md에 
 ## 6. 판정과 반복
 
 1. `evaluation.md` 첫 줄이 `PASS`이면 반복을 종료하라.
-2. 첫 줄이 `FAIL`이고 `ATTEMPT_COUNT`가 3 미만이면 `ATTEMPT_COUNT`를 1 증가시키고 새 `ITERATION_DIR`을 만든 뒤 3단계로 돌아가라. 직전 평가 파일의 경로를 새 개발 Agent에 전달하라.
+2. 첫 줄이 `FAIL`이고 `ATTEMPT_COUNT`가 3 미만이면 `ATTEMPT_COUNT`를 1 증가시키고 새 `ITERATION_DIR`을 만든 뒤 3단계로 돌아가라. `기성 Skill 여부`가 `true`여도 두 번째 사이클부터는 개발 단계를 생략하지 마라. 직전 평가 파일의 경로를 새 개발 Agent에 전달하라.
 3. 첫 줄이 `FAIL`이고 `ATTEMPT_COUNT`가 3이면 반복 한도에 도달한 것이다. 4번째 반복을 시작하지 말고 마지막 `evaluation.md`에서 FAIL이 발생한 항목, 각 항목의 근거, 기대 동작, 확인 방법과 필수 수정 사항을 빠짐없이 요약하여 사용자에게 제시하라. 해당 FAIL 지점과 다음 수정 방향을 사용자가 확인하도록 요청한 뒤 종료하라.
 4. 필요한 사용자 입력의 부재, 권한 제한, 접근 불가 서비스처럼 개발 Agent가 코드로 해소할 수 없는 차단 사유가 확인되면 3회에 도달하기 전이라도 무의미한 재실행을 중단하고 사용자에게 차단된 지점과 필요한 조치를 요청하라.
 
