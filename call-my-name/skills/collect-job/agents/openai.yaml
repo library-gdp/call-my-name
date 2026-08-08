@@ -1,4 +1,4 @@
 interface:
   display_name: "채용공고 수집"
-  short_description: "파일의 채용공고 URL을 따라 원문을 추출·저장합니다"
-  default_prompt: "$collect-job을 사용해 src/jobs/JOB_SEEKER.md의 URL에서 채용공고 원문을 수집해 줘."
+  short_description: "선별한 기업·URL의 공식 채용공고 원문을 보존해 저장합니다"
+  default_prompt: "$collect-job을 사용해 src/JOB_SEEKER.md의 기업 목록과 URL을 확인하고, 식별 쿼리를 보존해 정규화한 공개 URL을 먼저 열어 공식 채용 페이지를 우선 탐색해 줘. 조건에 맞는 공고 원문·상세 리소스 구조·증거를 보존해 수집해 줘."
