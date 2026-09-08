@@ -16,7 +16,7 @@ call-my-name/
     ├── collect-user-context/
     ├── review-user-profile/
     ├── collect-job/
-    └── write-korean-cover-letter/
+    └── write-cover-letter/
 ```
 
 `AGENTS.md`, `.agents/`, `.codex/`, `docs/`, `__workspace__/`는 저장소 개발 자산이므로 플러그인 배포물에 포함하지 않는다. 플러그인이 사용자 작업공간에서 실행되면서 만드는 `__workspace__/`도 배포 디렉터리와는 별개의 런타임 데이터다.
@@ -28,7 +28,7 @@ call-my-name/
 구현은 두 계층으로 나뉜다.
 
 - 구성 가능한 파이프라인: 작업공간 초기화, 문서 파싱, 사용자 컨텍스트 수집·검토, 채용공고 원문 수집을 각각 독립 Skill로 제공한다.
-- 통합 작성 Skill: `write-korean-cover-letter`가 프로필 구축, 현재 공고 탐색·비교, 기업 조사와 자기소개서 작성을 요청 범위에 맞춰 수행한다.
+- 문항 작성 Skill: `write-cover-letter`가 이전 워크플로우에서 확정한 사용자 컨텍스트를 읽어 자기소개서 문항별 파일을 작성한다.
 
 현재 파이프라인 Skill 사이에는 프로세스 수준의 직접 호출이나 중앙 오케스트레이터가 없다. Codex가 Skill 계약과 작업공간의 파일을 통해 다음 단계를 연결한다. 예외적으로 `collect-user-context`는 비텍스트 문서를 읽을 때 `parse-document-files`를 명시적으로 사용한다.
 
@@ -62,8 +62,9 @@ setup-workspace
   │
   └─> src/jobs/JOB_SEEKER.md ─> collect-job ─> __workspace__/agent/jobs/*.md
 
-사용자 자료 + 공개 웹의 현재 공고·기업 정보
-  └─> write-korean-cover-letter ─> 프로필 요약·공고 비교·자기소개서 응답
+collect-user-context가 생성하고 review-user-profile이 같은 경로에서 검토·갱신한
+USER_INSPECTION.md + 사용자 제공 문항·선택적 Job Description
+  └─> write-cover-letter ─> target/cover-letter-.../question-XX.md
 ```
 
 `src/`는 사용자 입력 영역이며 초기화 이후 플러그인이 내용을 소유하지 않는다. `__workspace__/agent/`는 후속 Skill이 재사용하는 내부 산출물 영역이다. `setup-workspace`는 내부 산출물을 미리 만들지 않으며 `.gitignore`도 변경하지 않는다.
@@ -77,7 +78,7 @@ setup-workspace
 | 사용자 분석 | `collect-user-context` | 자료와 확인 가능한 공개 링크에서 사실·경험·역량을 구조화 | `src/user-info/` | `__workspace__/agent/USER_INSPECTION.md` 전체 재생성 |
 | 사용자 분석 | `review-user-profile` | 프로필을 섹션별로 표시하고 사용자 승인·정정 반영 | `USER_INSPECTION.md`, `PASS`/`FIX`/`MANUAL` 응답 | 검증된 섹션을 같은 파일에 원자적으로 반영 |
 | 공고 수집 | `collect-job` | URL별 공개 공고 본문을 요약 없이 정제·보존 | `src/jobs/JOB_SEEKER.md` | `__workspace__/agent/jobs/<공고명>_<수집일>.md` |
-| 통합 지원 | `write-korean-cover-letter` | 프로필 구축, 현재 공고 탐색·적합도 비교, 맞춤 자기소개서 작성 | 사용자 자료·대화, 공고 또는 문항, 공개 웹 | 대화 응답으로 프로필 요약, 공고 비교표, 초안과 근거 매핑 제공 |
+| 지원 서류 | `write-cover-letter` | 이전 사용자 컨텍스트로 문항별 자기소개서 작성 | `USER_INSPECTION.md`, 프롬프트·문항 파일, 선택적 사용자 제공 Job Description | `target/cover-letter-.../question-XX.md` 문항별 파일 |
 
 ### 4.1 `setup-workspace`
 
@@ -115,11 +116,13 @@ setup-workspace
 
 출력은 공고별 원문 보존 문서다. 공고명, 선택적으로 기업명, 입력 또는 공식 대체 원문 URL, 수집일을 메타데이터로 기록하고, 모집 관련 본문은 번역·요약·재분류하지 않는다. 파일 단위 부분 성공과 원자적 교체를 적용한다. 상세 선택·파일명·본문 계약은 `references/extraction-contract.md`가 정의한다.
 
-### 4.6 `write-korean-cover-letter`
+### 4.6 `write-cover-letter`
 
-사용자 요청에 따라 프로필 구축, 공고 탐색, 자기소개서 작성 중 필요한 단계부터 시작하는 통합 Skill이다. 현재 공고와 기업 정보를 다룰 때 공개 웹을 실제로 확인하고 링크, 공고 상태·마감일과 확인 날짜를 제시한다.
+사용자가 프롬프트 또는 파일 레퍼런스로 제공한 하나 이상의 문항을 처리한다. 사용자 컨텍스트 선행 순서는 `collect-user-context` → `review-user-profile`이며, 전자는 `WORKSPACE_ROOT/__workspace__/agent/USER_INSPECTION.md`를 생성하고 후자는 사용자 승인·정정을 반영해 같은 파일을 갱신한다. `write-cover-letter`는 이 최종 공유 파일만 사용자 컨텍스트 분석 자료로 사용한다. 파일이 없거나 필수 섹션을 안전하게 읽을 수 없으면 사실에 근거한 자기소개서를 작성할 수 없다는 사유를 설명하고, 두 선행 Skill을 순서대로 완료하도록 안내한 뒤 Subagent·`target/`·답변 파일을 만들지 않고 종료한다. 두 선행 Skill을 대신 호출하지 않는다. 사용자가 함께 제공한 Job Description만 선택적으로 반영한다. 지원 동기·회사 선택 이유 문항에는 확인 가능한 지원 회사와 사용자가 제공한 회사 관련 사실 또는 지원 이유가, 지원 직무 선택 이유·희망 업무·직무 적합성 문항에는 지원 직무가 필요하다. 이 핵심 정보가 없으면 `확인 필요`가 든 파일을 만들지 않고, 파일 생성 전에 누락 항목만 사용자에게 확인한다. JD 미제공만으로는 확인을 요구하지 않는다.
 
-자기소개서 결과에는 초안뿐 아니라 문단별 사용자 사실·JD 요구사항의 근거 매핑, 검증할 값, 사용하지 않은 핵심 소재와 글자 수를 함께 제공한다. 문항별 작성 관점과 퇴고 기준은 `references/writing-guide.md`에 분리되어 있다.
+상위 Skill은 사전 점검 통과 후 실행 작업공간 루트의 작업별 `target/cover-letter-.../` 디렉터리를 만들고, 문항마다 정확히 하나의 Subagent에 `question-XX.md` 작성을 배정한다. 담당 Subagent가 자신의 개별 답변 파일을 직접 작성하며, 수정도 같은 담당자만 수행한다. 답변은 사용자가 요청한 언어를 기본으로 하고, 가능한 한 사용자 경험을 근거로 구성한다. 본문은 사용자가 정한 글자 수 제한 이내에서 사실성과 가독성을 해치지 않는 범위로 최대치에 가깝게 작성한다. `(700자)`처럼 공백 기준이 생략된 단일 제한은 공백 포함 최대 글자 수로 해석한다. 상세 파일 계약과 점검 기준은 `write-cover-letter/references/output-contract.md`에 분리되어 있고, 검증 실행의 원본 위임·도구 기록 및 외부 공고 미사용 증거 보존은 `write-cover-letter/references/verification-evidence.md`가 정의한다.
+
+이 Skill은 외부 모집공고 정보를 수집하거나 사용하지 않는다. 따라서 `collect-job`, `src/jobs/`, `__workspace__/agent/jobs/` 및 외부 모집공고 수집 Skill 결과는 입력 경로가 아니다.
 
 ## 5. 데이터 계약과 일관성
 
@@ -128,6 +131,7 @@ Skill 간 결합은 공유 파일의 경로와 Markdown/JSON 계약에 한정한
 - 사용자 프로필 계약: `collect-user-context/references/user-inspection-format.md`
 - 프로필 표시·수동 편집 계약: `review-user-profile/references/review-format.md`
 - 채용공고 원문 계약: `collect-job/references/extraction-contract.md`
+- 자기소개서 답변 계약: `write-cover-letter/references/output-contract.md`
 - 문서 추출 반환 계약: `parse-document-files/SKILL.md`의 JSON 구조
 
 파일을 생성하거나 수정하는 Skill은 가능한 경우 완성본을 같은 디렉터리의 임시 파일에 먼저 기록한 뒤 최종 경로로 원자적으로 교체한다. 필수 입력이 없거나 계약을 안전하게 검증할 수 없으면 기존 산출물을 유지한다. 수집은 현재 입력을 기준으로 전체 재생성하며 과거 결과와 암묵적으로 병합하지 않는다.
@@ -157,4 +161,4 @@ Skill 간 결합은 공유 파일의 경로와 Markdown/JSON 계약에 한정한
 
 현재 플러그인에는 별도 MCP 서버, App, Hook 또는 데이터베이스가 포함되어 있지 않다. 외부 정보 접근은 Codex 실행 환경이 제공하는 웹 기능을 사용하며, 프로필과 수집 공고는 사용자 작업공간의 Markdown 파일로 보존한다.
 
-또한 `write-korean-cover-letter`는 구성 가능한 수집 Skill의 산출물을 반드시 입력으로 소비하도록 강제된 오케스트레이터가 아니라 독립적인 통합 Skill이다. 따라서 현재 아키텍처에서 자동화된 종단 간 파이프라인은 Skill 선택과 파일 계약을 따르는 Codex의 실행 흐름으로 구성된다.
+`write-cover-letter`는 `USER_INSPECTION.md`를 소비하는 후속 작성 Skill이며, 공고 수집 흐름과 결합하지 않는다. Skill 간 실행 순서는 Codex가 사용자의 요청과 파일 계약에 따라 선택한다.
