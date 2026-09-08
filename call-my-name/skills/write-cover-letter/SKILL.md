@@ -1,11 +1,11 @@
 ---
 name: write-cover-letter
-description: Write one or more truthful Korean cover-letter answers from questions supplied in the prompt or a referenced file, using the candidate context created by the previous call-my-name workflow. Optionally tailor answers to a user-supplied Job Description. Create one target file per question through one subagent per answer. Use when the user asks to 자기소개서 작성, 자소서 문항 답변, cover letter answers, 문항별 초안, or a 글자 수 제한 자기소개서.
+description: Write one or more truthful cover-letter answers in the user's requested language from questions supplied in the prompt or a referenced file, using the candidate context created by the previous call-my-name workflow. Optionally tailor answers to a user-supplied Job Description. Create one target file per question through one subagent per answer. Use when the user asks to 자기소개서 작성, 자소서 문항 답변, cover letter answers, 문항별 초안, or a 글자 수 제한 자기소개서.
 ---
 
 # 자기소개서 문항 작성
 
-사용자가 제공한 자기소개서 문항마다 정해진 글자 수 이내의 한국어 초안을 작성하고, 작업별 `target/` 하위 디렉터리에 문항별 Markdown 파일을 남긴다.
+사용자가 제공한 자기소개서 문항마다 정해진 글자 수 이내의 초안을 요청 언어로 작성하고, 작업별 `target/` 하위 디렉터리에 문항별 Markdown 파일을 남긴다.
 
 ## 입력 확인
 
@@ -23,6 +23,12 @@ description: Write one or more truthful Korean cover-letter answers from questio
 - 사용자 컨텍스트와 사용자가 제공한 Job Description 외의 모집공고 정보는 고려하지 마라.
 - `USER_INSPECTION.md`의 사실·경험·역량 및 사용자가 현재 대화에서 확인한 정보만 사용한다. 경험, 수치, 역할, 성과, 회사 정보, 동기를 창작하지 마라.
 - 주민등록번호, 상세 주소, 계정·인증 정보 등 불필요한 개인정보를 답변이나 파일에 넣지 마라.
+
+## 작성 언어와 분량
+
+- 기본적으로 사용자가 요청한 언어로 작성한다. 언어를 명시하지 않았다면 요청과 자기소개서 문항에 사용된 주된 언어를 따른다. 둘이 다르거나 판단이 모호하면 파일을 만들기 전에 원하는 작성 언어를 확인한다.
+- 일반론이나 추측보다 `USER_INSPECTION.md`에서 확인되는 사용자의 경험과 그 경험이 뒷받침하는 행동·역할·결과를 최대한 근거로 삼는다. 문항에 적합한 경험이 부족하면 사실을 만들거나 무관한 경험을 억지로 연결하지 말고 필요한 정보만 사용자에게 확인한다.
+- 글자 수 제한을 넘지 않는 범위에서 답변을 가능한 한 최대치에 가깝게 작성한다. 분량을 채우기 위한 반복, 과장, 새 사실 창작은 금지하며, 근거가 충분한 경험의 상황·행동·결과와 문항에 대한 연결을 구체화하여 분량을 확보한다.
 
 ## 문항별 병렬 작성과 저장
 
