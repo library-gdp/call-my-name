@@ -18,3 +18,5 @@ desktop.ini
 *.tmp
 *.temp
 __workspace__/
+/src/
+/call-my-name/skills/parse-document-files/scripts/

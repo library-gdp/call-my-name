@@ -1,0 +1,4 @@
+interface:
+  display_name: "자기소개서 문항 작성"
+  short_description: "이전 사용자 컨텍스트로 문항별 자소서 파일을 작성합니다"
+  default_prompt: "Use $write-cover-letter to write my cover-letter questions within their character limits using my previous user context. Ask for only the missing company or target-role information before creating files when a question requires it."
